@@ -15,11 +15,13 @@ complete -o default -F __start_kubectl k
 kHelp() {
   echo "================"
   echo "Commands available:"
-  echo "kGetCurrNamespace                    - Get the current context namespace"
+  echo "kGetCurrNamespace                    - Get the current context namespace."
   echo "kGetDeploymentYaml <deployment-name> - Get the YAML of the deployment with the given name."
-  echo "kGetPod <pod-prefix>                 - Get the name of a pod with the given prefix"
-  echo "kSetNamespace <namespace>            - Set the current context's namespace"
+  echo "kGetPod <pod-prefix>                 - Get the name of a pod with the given prefix."
+  echo "kSetNamespace <namespace>            - Set the current context's namespace."
   echo "kTailLogForPod <pod-name>            - Follow the logs for the pod."
+  echo "eksSetCluster <cluster-name>         - Add entry in ~/.kube/config for an EKS cluster (requires aws cli on path)."
+
 }
 
 kGetCurrNamespace() {
@@ -66,4 +68,20 @@ kGetDeploymentYaml() {
   fi
 
   kubectl get deployment $1 -o yaml
+}
+
+
+eksSetCluster() {
+  if [ -z "$1" ]; then
+    echo "Usage: eksSetCluster <cluster-name>"
+    return 1
+  fi
+
+  # This will:
+  # 1. Use the AWS CLI to contact EKS (make sure that is available on the path)
+  # 2. Update the k8s config in ~/.kube/config so that kubectl knows:
+  #    (i) which cluster to connect to, (ii) what credentials to use (AWS IAM),
+  #    (iii) what context name to use e.g. rn:aws:eks:region:account-id:cluster/some-cluster
+  # After running this you can run commands like `kubectl get nodes` like normal.
+  aws eks update-kubeconfig --name $1
 }
