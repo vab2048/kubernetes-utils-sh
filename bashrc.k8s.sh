@@ -17,6 +17,7 @@ kHelp() {
   echo "Commands available:"
   echo "kGetCurrNamespace                    - Get the current context namespace."
   echo "kGetDeploymentYaml <deployment-name> - Get the YAML of the deployment with the given name."
+  echo "kGetCronJobs                         - Get a list of cron jobs."
   echo "kGetPod <pod-prefix>                 - Get the name of a pod with the given prefix."
   echo "kSetNamespace <namespace>            - Set the current context's namespace."
   echo "kTailLogForPod <pod-name>            - Follow the logs for the pod."
@@ -50,6 +51,14 @@ kGetPod() {
     return 1
   fi
     kubectl get pods | grep $1 | awk '{print $1}'
+}
+
+kGetCronJobs() {
+  # Just list the cronjobs available.
+  # Note to spawn a new job use:
+  #  template: `kubectl create job --from=cronjob/<name-as-appears-on-output> <name-of-pod-which-will-be-spawned>`
+  #  e.g.      `kubectl create job --from=cronjob/some-job-name some-job-name-run-1
+  kubectl get cronjob
 }
 
 kTailLogForPod() {
